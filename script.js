@@ -11,8 +11,8 @@ let total = 0;
 let isSaving = false;
 let alreadyOpenedWA = false;
 
-const SUPABASE_URL = 'https://avycdfdbprllrqgzwkwe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2eWNkZmRicHJsbHJxZ3p3a3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NzAwMjEsImV4cCI6MjA3NTM0NjAyMX0.ydsK-epIo7wQBT3H44u2eJVqJFVhUtNOTRQQ8nQTCg4';
+const SUPABASE_URL = '';
+const SUPABASE_ANON_KEY = '';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ---------- Helpers de fecha ---------- */
