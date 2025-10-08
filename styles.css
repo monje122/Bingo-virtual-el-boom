@@ -312,3 +312,4 @@ ul{ padding-left: 20px; margin: 10px 0 12px }
 .carton.occupied::after{
   transform: translate(-50%, -50%) rotate(-45deg);
 }
+button[disabled]{ opacity:.6; cursor:not-allowed; transform:none!important; box-shadow:none!important; }
