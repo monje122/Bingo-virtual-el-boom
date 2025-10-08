@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bingo Virtual El Boom</title>
+  <title>Bingo Web</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -29,20 +29,35 @@
   </div>
 
   <!-- Admin -->
-  <div id="admin-window" class="hidden">
+<!-- LOGIN ADMIN -->
+<div id="admin-window" class="hidden">
   <h2>Acceso Administrador</h2>
-<input type="email" id="admin-email" placeholder="Correo electrónico" />
-<input type="password" id="admin-password" placeholder="Contraseña" />
-<button onclick="loginAdmin()">Entrar</button>
-
-      <p><strong>Cartones vendidos:</strong> <span id="sold-count">0</span></p>
-      <p><strong>Clientes inscritos:</strong> <span id="clients-count">0</span></p>
-      <div id="proofs-container"></div>
-      <button onclick="resetData()">Reiniciar Cartones</button>
-      <button onclick="goHome()" style="margin-top: 10px;">Inicio</button> <!-- <-- botón nuevo -->
+  <input type="email" id="admin-email" placeholder="Correo electrónico" />
+  <input type="password" id="admin-password" placeholder="Contraseña" />
+  <div class="cartons-actions">
+    <button onclick="loginAdmin()">Entrar</button>
+    <button onclick="goHome()">Inicio</button>
+  </div>
 </div>
 
-    </div>
+<!-- PANEL ADMIN (se muestra SOLO después del login) -->
+<div id="admin-panel-window" class="hidden">
+  <h2>Panel Administrador</h2>
+
+  <div class="admin-stats">
+    <p><strong>Cartones vendidos:</strong> <span id="sold-count">0</span></p>
+    <p><strong>Clientes inscritos:</strong> <span id="clients-count">0</span></p>
+  </div>
+
+  <div id="proofs-container"></div>
+
+  <div class="cartons-actions">
+    <button onclick="resetData()">Reiniciar Cartones</button>
+    <button onclick="logout()">Cerrar sesión</button>
+    <button onclick="goHome()">Inicio</button>
+  </div>
+</div>
+
 
   <!-- Cartones -->
   <div id="cartons-window" class="hidden">
@@ -71,7 +86,8 @@
     <label for="proof">Sube el comprobante de pago:</label>
     <input type="file" id="proof"
            accept="image/*" />
-    <button onclick="saveInscription()">Enviar por WhatsApp</button>
+    <button id="whatsapp-btn" onclick="saveInscription()">Enviar por WhatsApp</button>
+
     <button onclick="goHome()" style="margin-top: 10px;">Inicio</button> 
   </div>
 <div style="display: flex; gap: 10px; margin-top: 15px;">
