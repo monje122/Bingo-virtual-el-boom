@@ -300,61 +300,80 @@ function formatCartons(arr){
   }
   return res.join(', ');
 }
-// helper: borrar todo un bucket con paginación (raíz)
-async function deleteAllFromBucket(bucketName) {
-  const pageSize = 100;
-  let offset = 0;
+// ---- Helpers Storage ----
+function storagePathFromPublicUrl(url){
+  const m = /\/object\/public\/([^/]+)\/(.+)$/.exec(url || '');
+  return m ? m[2] : null;      // ruta dentro del bucket
+}
 
+// Borra los comprobantes según las URLs guardadas en la BD
+async function deleteProofsFromDBRows(){
+  const { data, error } = await supabase.from('inscripciones').select('proof_url');
+  if (error) throw error;
+
+  const paths = (data || [])
+    .map(r => storagePathFromPublicUrl(r.proof_url))
+    .filter(Boolean);
+
+  if (!paths.length) return 0;
+
+  const { error: delErr } = await supabase.storage.from('comprobantes').remove(paths);
+  if (delErr) throw delErr;
+
+  return paths.length;
+}
+
+// Borra TODO lo que haya en la raíz del bucket (con paginación)
+// deletePlaceholder=true para borrar también ".emptyFolderPlaceholder"
+async function deleteAllFromBucketRoot(bucket = 'comprobantes', deletePlaceholder = false){
+  let page = 0, size = 100;
   while (true) {
-    const { data: files, error: listErr } = await supabase
-      .storage.from(bucketName)
-      .list('', { limit: pageSize, offset });
+    const { data: files, error } = await supabase.storage
+      .from(bucket)
+      .list('', { limit: size, offset: page*size, sortBy: { column: 'name', order: 'asc' } });
 
-    if (listErr) throw listErr;
-    if (!files || files.length === 0) break;
+    if (error) throw error;
+    if (!files?.length) break;
 
-    const names = files.map(f => f.name); // están en raíz
-    const { error: delErr } = await supabase.storage.from(bucketName).remove(names);
-    if (delErr) throw delErr;
+    const names = files
+      .map(f => f.name)
+      .filter(n => deletePlaceholder ? true : n !== '.emptyFolderPlaceholder');
 
-    // si hay más, seguimos
-    if (files.length < pageSize) break;
-    offset += pageSize;
+    if (names.length){
+      const { error: delErr } = await supabase.storage.from(bucket).remove(names);
+      if (delErr) throw delErr;
+    }
+
+    if (files.length < size) break;
+    page++;
   }
 }
 
+// ---- Botón Reset (FULL) ----
 async function resetData() {
-  // 1) doble confirmación porque es destructivo
   if (!confirm("⚠️ Esto borrará TODO: inscripciones + boletas + comprobantes. ¿Continuar?")) return;
-  if (!confirm("Última confirmación: esta acción no se puede deshacer. ¿Borrar definitivamente?")) return;
+  if (!confirm("Última confirmación: acción irreversible. ¿Borrar definitivamente?")) return;
 
-  // 2) requiere sesión de admin
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData?.session) {
-    alert("Debes iniciar sesión como administrador para poder reiniciar.");
+    alert("Debes iniciar sesión como administrador.");
     return;
   }
 
-  // 3) feedback en botón (opcional)
   const btns = Array.from(document.querySelectorAll('button'));
-  btns.forEach(b => (b.disabled = true));
+  btns.forEach(b => b.disabled = true);
 
   try {
-    // 3.a) borrar archivos del bucket 'comprobantes'
-    await deleteAllFromBucket('comprobantes');
+    // 1) Borrar comprobantes (por rutas en la BD) + escoba en bucket
+    await deleteProofsFromDBRows();                  // borra los que están referenciados
+    await deleteAllFromBucketRoot('comprobantes', true); // y limpia todo lo demás (incluye placeholder)
 
-    // 3.b) borrar filas de boletas (si existe)
-    try {
-      await supabase.from('boletas').delete().neq('id', 0);
-    } catch (e) {
-      console.warn('No se pudo borrar boletas (quizá no existe):', e);
-    }
-
-    // 3.c) borrar filas de inscripciones
+    // 2) Borrar tablas
+    try { await supabase.from('boletas').delete().neq('id', 0); } catch(e){ /* opcional */ }
     const { error: delInsErr } = await supabase.from('inscripciones').delete().neq('id', 0);
     if (delInsErr) throw delInsErr;
 
-    // 4) limpiar estado del front
+    // 3) Reset UI/estado
     occupiedCartons = new Set();
     selectedCartons = [];
     inscriptions = [];
@@ -367,14 +386,12 @@ async function resetData() {
     if (clients) clients.textContent = 0;
     if (proofs) proofs.innerHTML = "<h3>Comprobantes:</h3><p>(Vacío)</p>";
 
-    // refrescar grilla
     await fetchOccupiedCartons();
-
     alert("✅ Todo fue reiniciado correctamente.");
   } catch (err) {
     console.error(err);
     alert("❌ Error al reiniciar: " + (err?.message || err));
   } finally {
-    btns.forEach(b => (b.disabled = false));
+    btns.forEach(b => b.disabled = false);
   }
 }
