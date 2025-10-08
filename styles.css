@@ -1,0 +1,314 @@
+/* =========================
+   Bingo Virtual EL BOOM! – UI Glow
+   Colores tomados del logo
+   ========================= */
+:root{
+  --c-deep: #161a1d;
+  --c-blue: #2d5be3;      /* azul bola */
+  --c-teal: #0fb8b3;      /* turquesa */
+  --c-green: #79d70f;     /* verde Bingo */
+  --c-lime: #c9f31d;      /* verde lima/amarillo */
+  --c-orange:#ff7a00;     /* naranja bola */
+  --c-red:   #ff1843;     /* rojo EL BOOM! */
+  --c-gold:  #ffd54f;
+  --card-bg: rgba(255,255,255,0.12);
+  --card-br: rgba(255,255,255,0.35);
+  --muted:   #e6f2ff;
+}
+
+/* Tipografía */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+
+body{
+  font-family: 'Poppins','Segoe UI',system-ui,-apple-system,Arial, sans-serif;
+  margin:0;
+  color:#f5f7fb;
+  /* Fondo con gradiente animado que respeta la paleta del logo */
+  background: radial-gradient(1200px 800px at 20% 10%, rgba(201,243,29,.22), transparent),
+              radial-gradient(1000px 700px at 85% 15%, rgba(45,91,227,.18), transparent),
+              radial-gradient(900px 600px at 50% 90%, rgba(255,122,0,.18), transparent),
+              linear-gradient(135deg, #1b2130, #0e1320 60%, #111827);
+  overflow-x:hidden;
+}
+
+/* Brillos suaves flotando */
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto auto -15% -10%;
+  width:55vmax; height:55vmax;
+  background: radial-gradient(closest-side, rgba(255,24,67,.16), transparent 70%);
+  filter: blur(40px);
+  animation: float 18s ease-in-out infinite;
+  pointer-events:none;
+}
+body::after{
+  left:auto; bottom:-10%; right:-10%;
+  background: radial-gradient(closest-side, rgba(15,184,179,.14), transparent 70%);
+  animation-duration: 22s;
+}
+
+@keyframes float{
+  0%,100%{ transform:translateY(0) }
+  50%{ transform:translateY(-25px) }
+}
+
+.hidden{ display:none }
+
+/* Tarjetas / ventanas (glassmorphism + glow) */
+#main-container,
+#inscription-window,
+#admin-window,
+#cartons-window,
+#payment-window{
+  max-width: 560px;
+  margin: 48px auto;
+  background: var(--card-bg);
+  border: 1px solid var(--card-br);
+  border-radius: 22px;
+  padding: 28px 22px;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: cardIn .5s ease;
+}
+
+@keyframes cardIn{
+  from{ transform: translateY(10px) scale(.98); opacity:0 }
+  to  { transform: translateY(0)     scale(1);   opacity:1 }
+}
+
+header{ text-align:center }
+
+#logo{
+  display:block;
+  margin: 8px auto 6px;
+  width: 280px;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+  animation: logoPop .6s ease;
+}
+@keyframes logoPop{
+  0%{ transform:scale(.9); opacity:.2 }
+  100%{ transform:scale(1); opacity:1 }
+}
+
+h2{
+  text-align:center;
+  color: var(--muted);
+  letter-spacing:.3px;
+  font-weight:700;
+  text-shadow: 0 0 12px rgba(45,91,227,.25);
+  margin-top: 6px;
+}
+
+/* Texto */
+p, li, label{
+  font-size: 15.5px;
+  color:#e8eefc;
+  opacity:.95;
+}
+
+/* Botones (glow + 3D click) */
+.botones{ display:flex; flex-direction:column; gap:14px; margin-top:20px }
+
+.botones button, button{
+  position:relative;
+  padding: 12px 14px;
+  background: linear-gradient(90deg, var(--c-blue), var(--c-teal));
+  color:#fff;
+  font-size: 16px;
+  font-weight:600;
+  border:none;
+  border-radius: 12px;
+  cursor:pointer;
+  box-shadow:
+    0 8px 18px rgba(45,91,227,.35),
+    inset 0 -2px 0 rgba(255,255,255,.15);
+  transition: transform .12s ease, box-shadow .25s ease, filter .25s ease;
+  overflow:hidden;
+}
+button:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 32px rgba(15,184,179,.35),
+    inset 0 -2px 0 rgba(255,255,255,.2);
+  filter: saturate(1.1);
+}
+button:active{ transform: translateY(1px) scale(.99) }
+
+/* Brillo que pasa por encima del botón */
+button::after{
+  content:"";
+  position:absolute;
+  top:0; left:-120%;
+  width:120%; height:100%;
+  background: linear-gradient(75deg, transparent, rgba(255,255,255,.25), transparent 60%);
+  transform: skewX(-20deg);
+  transition: left .6s ease;
+}
+button:hover::after{ left:120% }
+
+/* Inputs */
+input, select{
+  width:100%;
+  padding: 11px 12px;
+  font-size: 15px;
+  color:#0b1220;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.45);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  outline:none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+input:focus, select:focus{
+  border-color: var(--c-blue);
+  box-shadow: 0 0 0 4px rgba(45,91,227,.18);
+}
+
+/* Lista */
+ul{ padding-left: 20px; margin: 10px 0 12px }
+
+/* GRID de cartones */
+#cartons-container{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+
+.carton{
+  position:relative;
+  height: 44px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.85), rgba(245,248,255,.88)),
+    radial-gradient(120% 160% at -10% -20%, rgba(255,255,255,.8), transparent 60%);
+  color:#0c1016;
+  font-weight:700;
+  font-size: 14px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.8);
+  transition: transform .09s ease, box-shadow .2s ease, filter .2s ease;
+}
+.carton:hover{ transform: translateY(-2px); filter: saturate(1.1) }
+.carton:active{ transform: translateY(0) scale(.98) }
+
+/* Seleccionado = dorado + pulso */
+.carton.selected{
+  background: linear-gradient(180deg, #ffe680, #ffc933);
+  box-shadow:
+    0 10px 22px rgba(255,184,0,.35),
+    inset 0 2px 0 rgba(255,255,255,.8);
+  color:#2b1e00;
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{ box-shadow: 0 10px 22px rgba(255,184,0,.35), inset 0 2px 0 rgba(255,255,255,.8) }
+  50%     { box-shadow: 0 16px 30px rgba(255,184,0,.5), inset 0 2px 0 rgba(255,255,255,.85) }
+}
+
+/* Ocupado = rayado + bloqueo */
+.carton.occupied{
+  cursor:not-allowed;
+  color:#5d6370;
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 8px, rgba(240,241,248,.9) 8px 16px),
+    linear-gradient(180deg, rgba(190,199,215,.85), rgba(190,199,215,.85));
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.06),
+    0 0 0 rgba(0,0,0,0);
+}
+.carton.occupied::after{
+  content:"×";
+  position:absolute;
+  inset:0;
+  display:grid; place-items:center;
+  color: #ff4d6d;
+  font-weight:700;
+  font-size: 20px;
+  opacity:.65;
+}
+
+/* Tira del total + acciones */
+.total-row{
+  display:flex; align-items:center; justify-content:center;
+  gap:10px; margin: 6px 0 2px;
+}
+.total-row .price{
+  background: linear-gradient(90deg, var(--c-green), var(--c-lime));
+  color:#1a2100; font-weight:800; padding:6px 10px; border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(201,243,29,.25);
+}
+
+.cartons-actions{
+  display:flex; gap:10px; justify-content:center; margin-top:12px;
+}
+
+/* Galería comprobantes del admin */
+#proofs-container img{
+  margin-top:8px;
+  border-radius:12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.35);
+  width:160px; cursor:pointer;
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+#proofs-container img:hover{
+  transform: translateY(-2px) rotate(-.5deg);
+  box-shadow: 0 14px 28px rgba(0,0,0,.45);
+}
+
+/* Pequeños detalles responsivos */
+@media (max-width: 600px){
+  #main-container,
+  #inscription-window,
+  #admin-window,
+  #cartons-window,
+  #payment-window{
+    margin: 28px 14px;
+    padding: 22px 16px;
+  }
+  #logo{ width: 240px }
+  #cartons-container{ gap:7px }
+  .carton{ height:40px; font-size:13px }
+}
+/* === X grande y gruesa para cartones ocupados === */
+:root{
+  --x-size: 82%;        /* largo de la X respecto al ancho del cartón */
+  --x-thickness: 10px;  /* grosor de las barras de la X */
+  --x-color: #ff1843;   /* color de la X */
+}
+
+.carton.occupied{ position: relative; }
+
+/* Dibujamos la X con dos barras diagonales */
+.carton.occupied::before,
+.carton.occupied::after{
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--x-size);
+  height: var(--x-thickness);
+  background: linear-gradient(180deg, #ff4d6d, var(--x-color));
+  border-radius: 999px;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow: 0 3px 10px rgba(255, 24, 67, .45);
+  opacity: .95;
+}
+
+/* La segunda barra (cruza en sentido contrario) */
+.carton.occupied::after{
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
